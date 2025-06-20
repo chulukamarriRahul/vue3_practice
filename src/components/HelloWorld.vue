@@ -1,33 +1,48 @@
 <template>
   <div>
     <h1>Welcome to Vue Practice</h1>
-    <button @click="openAddDrawer">Add User</button>
 
-    <input placeholder="Search" v-model="searchInput" @input="onSearch" />
+    <div class="button-container">
+      <button class="add-user-btn" @click="openAddDrawer">Add User</button>
+    </div>
 
-    <table border="1" cellpadding="8" cellspacing="0">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Username</th>
-          <th>Email</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(item, index) in filteredData" :key="index">
-          <td>{{ item.id }}</td>
-          <td>{{ item.name }}</td>
-          <td>{{ item.username }}</td>
-          <td>{{ item.email }}</td>
-          <td>
-            <button @click="deleteUser(item.id)">Delete</button>
-            <button @click="openEditDrawer(item)">Update</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="search-bar">
+      <input
+        class="search-input"
+        placeholder="Search By Name"
+        v-model="searchInput"
+        @input="onSearch"
+      />
+    </div>
+    <div class="table-container">
+      <table border="1" cellpadding="8" cellspacing="0">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in filteredData" :key="index">
+            <td>{{ item.id }}</td>
+            <td>{{ item.name }}</td>
+            <td>{{ item.username }}</td>
+            <td>{{ item.email }}</td>
+            <td>
+              <button class="btn btn-danger" @click="deleteUser(item.id)">
+                Delete
+              </button>
+              <button class="btn btn-primary" @click="openEditDrawer(item)">
+                Update
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Drawer (Add/Edit User) -->
     <div v-if="isDrawerOpen" class="drawer">
@@ -40,8 +55,12 @@
           required
         /><br />
         <input v-model="newUser.email" placeholder="Email" required /><br />
-        <button type="submit">{{ isEditMode ? "Update" : "Submit" }}</button>
-        <button type="button" @click="closeDrawer">Cancel</button>
+        <button type="submit" class="btn btn-primary">
+          {{ isEditMode ? "Update" : "Submit" }}
+        </button>
+        <button type="button" class="btn btn-danger" @click="closeDrawer">
+          Cancel
+        </button>
       </form>
     </div>
   </div>
@@ -135,8 +154,7 @@ const submitUser = async () => {
       newUser.value
     );
     if (res.status === 201) {
-      const addedUser = { ...res.data, id: Date.now() };
-      users.value.push(addedUser);
+      const addedUser = { ...res.data };
       filteredData.value.push(addedUser);
       closeDrawer();
       console.log("User added:", addedUser);
@@ -147,29 +165,22 @@ const submitUser = async () => {
 };
 
 // Update user
-const updateUser = async () => {
-  try {
-    const res = await axios.put(
-      `https://jsonplaceholder.typicode.com/users/${editUserId.value}`,
-      newUser.value
-    );
-    if (res.status === 200) {
-      const updatedUser = { ...res.data, id: editUserId.value };
+const updateUser = () => {
+  alert("hi");
+  const updatedUser = { ...newUser.value, id: editUserId.value };
 
-      // Update in local users and filteredData
-      const updateInArray = (arr) => {
-        const index = arr.findIndex((user) => user.id === editUserId.value);
-        if (index !== -1) arr[index] = updatedUser;
-      };
-      updateInArray(users.value);
-      updateInArray(filteredData.value);
+  // Update users
+  users.value = users.value.map((user) =>
+    user.id === editUserId.value ? updatedUser : user
+  );
 
-      closeDrawer();
-      console.log("User updated:", updatedUser);
-    }
-  } catch (error) {
-    console.error("Failed to update user:", error);
-  }
+  // Update filteredData
+  filteredData.value = filteredData.value.map((user) =>
+    user.id === editUserId.value ? updatedUser : user
+  );
+
+  closeDrawer();
+  console.log("User updated:", updatedUser);
 };
 </script>
 
@@ -184,5 +195,78 @@ const updateUser = async () => {
   padding: 20px;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
   z-index: 1000;
+}
+
+.table-container {
+  height: 100vh;
+  overflow: auto;
+  width: 100%;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  text-align: left;
+  padding: 8px;
+}
+
+.button-container {
+  text-align: right;
+  margin-bottom: 10px;
+}
+
+.add-user-btn {
+  background-color: #007bff; /* Bootstrap blue */
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-user-btn:hover {
+  background-color: #0056b3;
+}
+.btn {
+  padding: 8px 14px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* Blue Buttons */
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+/* Red Buttons */
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #b52a37;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 300px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  font-size: 14px;
 }
 </style>
