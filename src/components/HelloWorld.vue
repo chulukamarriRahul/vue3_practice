@@ -44,7 +44,7 @@
       </table>
     </div>
 
-    <!-- Drawer (Add/Edit User) -->
+    <!-- canves -->
     <div v-if="isDrawerOpen" class="drawer">
       <h3>{{ isEditMode ? "Update User" : "Add User" }}</h3>
       <form @submit.prevent="isEditMode ? updateUser() : submitUser()">
@@ -85,7 +85,7 @@ const newUser = ref({
   email: "",
 });
 
-// Fetch Users
+// users list
 const usersInfo = async () => {
   const response = await axios.get(
     "https://jsonplaceholder.typicode.com/users"
@@ -108,14 +108,14 @@ const refilter = () => {
 };
 const onSearch = debounce(refilter, 500);
 
-// Open drawer for Add
+// Open canves for Add
 const openAddDrawer = () => {
   isEditMode.value = false;
   newUser.value = { name: "", username: "", email: "" };
   isDrawerOpen.value = true;
 };
 
-// Open drawer for Edit
+// Open canves for Edit
 const openEditDrawer = (user) => {
   isEditMode.value = true;
   editUserId.value = user.id;
@@ -123,7 +123,7 @@ const openEditDrawer = (user) => {
   isDrawerOpen.value = true;
 };
 
-// Close drawer
+// Close canves
 const closeDrawer = () => {
   isDrawerOpen.value = false;
   newUser.value = { name: "", username: "", email: "" };
@@ -169,12 +169,6 @@ const updateUser = () => {
   alert("hi");
   const updatedUser = { ...newUser.value, id: editUserId.value };
 
-  // Update users
-  users.value = users.value.map((user) =>
-    user.id === editUserId.value ? updatedUser : user
-  );
-
-  // Update filteredData
   filteredData.value = filteredData.value.map((user) =>
     user.id === editUserId.value ? updatedUser : user
   );
